@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// Local constants init
 const (
 	Name      = "name"
 	Password  = "password"
@@ -16,6 +17,7 @@ const (
 	Type      = "type"
 )
 
+// resourceAdministratorsUser create administrators user throw panorama or firewall
 func resourceAdministratorsUser() *schema.Resource {
 	return &schema.Resource{
 		Create: createAdministratorsUser,
@@ -31,6 +33,7 @@ func resourceAdministratorsUser() *schema.Resource {
 	}
 }
 
+// administratorsUserSchema initialize the entry params
 func administratorsUserSchema() map[string]*schema.Schema {
 	ans := map[string]*schema.Schema{
 		Name: &schema.Schema{
@@ -62,25 +65,7 @@ func administratorsUserSchema() map[string]*schema.Schema {
 	return ans
 }
 
-func saveUser(d *schema.ResourceData, o user.Entry) {
-
-	if err := d.Set(Name, o.Name); err != nil {
-		return
-	}
-	if err := d.Set(PublicKey, o.PublicKey); err != nil {
-		return
-	}
-	if err := d.Set(RoleBased, o.Role); err != nil {
-		return
-	}
-	if err := d.Set(Type, o.Type); err != nil {
-		return
-	}
-	if err := d.Set(Password, o.PasswordHash); err != nil {
-		return
-	}
-}
-
+// parseUser parse the entry params to the user struct and get the template value
 func parseUser(d *schema.ResourceData) (user.Entry, string) {
 	tmpl := d.Get(Template).(string)
 
@@ -107,6 +92,7 @@ func parseUser(d *schema.ResourceData) (user.Entry, string) {
 	return o, tmpl
 }
 
+// createAdministratorsUser this func will create the administrators user
 func createAdministratorsUser(d *schema.ResourceData, meta interface{}) error {
 	pa := meta.(*pango.Panorama)
 	o, tmpl := parseUser(d)
@@ -124,10 +110,12 @@ func createAdministratorsUser(d *schema.ResourceData, meta interface{}) error {
 	return readAdministratorsUser(d, meta)
 }
 
+// buildPanoramaUserId this function will build the administrators user id in case of a template value in other word through panorama
 func buildPanoramaUserId(a, c string) string {
 	return strings.Join([]string{a, c}, IdSeparator)
 }
 
+// createAdministratorsUser this func will read the administrators users
 func readAdministratorsUser(d *schema.ResourceData, meta interface{}) error {
 
 	pa := meta.(*pango.Panorama)
@@ -142,11 +130,10 @@ func readAdministratorsUser(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	saveUser(d, o)
-
 	return nil
 }
 
+// updateAdministratorsUser this func will update the administrators user
 func updateAdministratorsUser(d *schema.ResourceData, meta interface{}) error {
 
 	pa := meta.(*pango.Panorama)
@@ -164,6 +151,7 @@ func updateAdministratorsUser(d *schema.ResourceData, meta interface{}) error {
 	return readAdministratorsUser(d, meta)
 }
 
+// deleteAdministratorsUser this func will delete the administrators user
 func deleteAdministratorsUser(d *schema.ResourceData, meta interface{}) error {
 	pa := meta.(*pango.Panorama)
 	o, tmpl := parseUser(d)
