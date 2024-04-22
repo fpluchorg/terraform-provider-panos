@@ -94,16 +94,19 @@ func parseUser(d *schema.ResourceData) (user.Entry, string) {
 
 // createAdministratorsUser this func will create the administrators user
 func createAdministratorsUser(d *schema.ResourceData, meta interface{}) error {
-	pa := meta.(*pango.Panorama)
 	o, tmpl := parseUser(d)
 
-	if err := pa.MGTConfig.User.Set(tmpl, o); err != nil {
-		return err
-	}
-
 	if tmpl != EmptyString {
+		pano := meta.(*pango.Panorama)
+		if err := pano.MGTConfig.User.Set(tmpl, o); err != nil {
+			return err
+		}
 		d.SetId(buildPanoramaUserId(tmpl, o.Name))
 	} else {
+		fw := meta.(*pango.Firewall)
+		if err := fw.MGTConfig.User.Set(o); err != nil {
+			return err
+		}
 		d.SetId(o.Name)
 	}
 
@@ -118,16 +121,26 @@ func buildPanoramaUserId(a, c string) string {
 // createAdministratorsUser this func will read the administrators users
 func readAdministratorsUser(d *schema.ResourceData, meta interface{}) error {
 
-	pa := meta.(*pango.Panorama)
 	o, tmpl := parseUser(d)
 
-	o, err := pa.MGTConfig.User.Get(tmpl, o.Name)
-	if err != nil {
-		if isObjectNotFound(err) {
-			d.SetId(EmptyString)
-			return nil
+	if tmpl != EmptyString {
+		pano := meta.(*pango.Panorama)
+		if _, err := pano.MGTConfig.User.Get(tmpl, o.Name); err != nil {
+			if isObjectNotFound(err) {
+				d.SetId(EmptyString)
+				return nil
+			}
+			return err
 		}
-		return err
+	} else {
+		fw := meta.(*pango.Firewall)
+		if _, err := fw.MGTConfig.User.Get(o.Name); err != nil {
+			if isObjectNotFound(err) {
+				d.SetId(EmptyString)
+				return nil
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -136,16 +149,28 @@ func readAdministratorsUser(d *schema.ResourceData, meta interface{}) error {
 // updateAdministratorsUser this func will update the administrators user
 func updateAdministratorsUser(d *schema.ResourceData, meta interface{}) error {
 
-	pa := meta.(*pango.Panorama)
 	o, tmpl := parseUser(d)
 
-	lo, err := pa.MGTConfig.User.Get(tmpl, o.Name)
-	if err != nil {
-		return err
-	}
-	lo.Copy(o)
-	if err = pa.MGTConfig.User.Edit(tmpl, o); err != nil {
-		return err
+	if tmpl != EmptyString {
+		pano := meta.(*pango.Panorama)
+		lo, err := pano.MGTConfig.User.Get(tmpl, o.Name)
+		if err != nil {
+			return err
+		}
+		lo.Copy(o)
+		if err = pano.MGTConfig.User.Edit(tmpl, o); err != nil {
+			return err
+		}
+	} else {
+		fw := meta.(*pango.Firewall)
+		lo, err := fw.MGTConfig.User.Get(o.Name)
+		if err != nil {
+			return err
+		}
+		lo.Copy(o)
+		if err = fw.MGTConfig.User.Edit(o); err != nil {
+			return err
+		}
 	}
 
 	return readAdministratorsUser(d, meta)
@@ -153,12 +178,21 @@ func updateAdministratorsUser(d *schema.ResourceData, meta interface{}) error {
 
 // deleteAdministratorsUser this func will delete the administrators user
 func deleteAdministratorsUser(d *schema.ResourceData, meta interface{}) error {
-	pa := meta.(*pango.Panorama)
 	o, tmpl := parseUser(d)
 
-	if err := pa.MGTConfig.User.Delete(tmpl, o.Name); err != nil {
-		if !isObjectNotFound(err) {
-			return err
+	if tmpl != EmptyString {
+		pano := meta.(*pango.Panorama)
+		if err := pano.MGTConfig.User.Delete(tmpl, o.Name); err != nil {
+			if !isObjectNotFound(err) {
+				return err
+			}
+		}
+	} else {
+		fw := meta.(*pango.Firewall)
+		if err := fw.MGTConfig.User.Delete(o.Name); err != nil {
+			if !isObjectNotFound(err) {
+				return err
+			}
 		}
 	}
 
