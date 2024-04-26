@@ -274,6 +274,7 @@ func Provider() terraform.ResourceProvider {
 			"panos_panorama_monitor_profile":                      resourcePanoramaMonitorProfile(),
 			"panos_panorama_nat_rule":                             resourcePanoramaNatRule(),
 			"panos_panorama_nat_rule_group":                       resourcePanoramaNatRuleGroup(),
+			"panos_panorama_password_complexity":                  resourcePanoramaPasswordComplexity(),
 			"panos_panorama_pbf_rule_group":                       resourcePanoramaPbfRuleGroup(),
 			"panos_panorama_redistribution_profile_ipv4":          resourcePanoramaRedistributionProfileIpv4(),
 			"panos_panorama_security_policy":                      resourcePanoramaSecurityPolicy(),
@@ -296,6 +297,7 @@ func Provider() terraform.ResourceProvider {
 			"panos_panorama_vlan_interface":                       resourcePanoramaVlanInterface(),
 			"panos_panorama_zone":                                 resourcePanoramaZone(),
 			"panos_panorama_zone_entry":                           resourcePanoramaZoneEntry(),
+			"panos_password_complexity":                           resourcePasswordComplexity(),
 			"panos_vm_auth_key":                                   resourceVmAuthKey(),
 
 			// Panorama aliases.
