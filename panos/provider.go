@@ -206,6 +206,7 @@ func Provider() terraform.ResourceProvider {
 			"panos_ldap_profile":                          resourceLdapProfile(),
 			"panos_local_user_db_group":                   resourceLocalUserDbGroup(),
 			"panos_local_user_db_user":                    resourceLocalUserDbUser(),
+			"panos_password_complexity":                   resourcePasswordComplexity(),
 			"panos_ospf":                                  resourceOspf(),
 			"panos_ospf_area":                             resourceOspfArea(),
 			"panos_ospf_area_interface":                   resourceOspfAreaInterface(),
@@ -297,7 +298,6 @@ func Provider() terraform.ResourceProvider {
 			"panos_panorama_vlan_interface":                       resourcePanoramaVlanInterface(),
 			"panos_panorama_zone":                                 resourcePanoramaZone(),
 			"panos_panorama_zone_entry":                           resourcePanoramaZoneEntry(),
-			"panos_password_complexity":                           resourcePasswordComplexity(),
 			"panos_vm_auth_key":                                   resourceVmAuthKey(),
 
 			// Panorama aliases.
