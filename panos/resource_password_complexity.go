@@ -31,9 +31,9 @@ const (
 // resourcePasswordComplexity create Password Complexity throw panorama or firewall
 func resourcePasswordComplexity() *schema.Resource {
 	return &schema.Resource{
-		Create: createPasswordComplexity,
+		Create: createUpdatePasswordComplexity,
 		Read:   readPasswordComplexity,
-		Update: updatePasswordComplexity,
+		Update: createUpdatePasswordComplexity,
 		Delete: deletePasswordComplexity,
 
 		Importer: &schema.ResourceImporter{
@@ -193,8 +193,8 @@ func parsePasswordComplexity(d *schema.ResourceData) (passwordcomplexity.Entry, 
 	return o, tmpl
 }
 
-// createPasswordComplexity this func will create the Password Complexity
-func createPasswordComplexity(d *schema.ResourceData, meta interface{}) error {
+// createUpdatePasswordComplexity this func will update the Password Complexity
+func createUpdatePasswordComplexity(d *schema.ResourceData, meta interface{}) error {
 	o, tmpl := parsePasswordComplexity(d)
 
 	if tmpl != EmptyString {
@@ -240,36 +240,6 @@ func readPasswordComplexity(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	return nil
-}
-
-// updatePasswordComplexity this func will update the Password Complexity
-func updatePasswordComplexity(d *schema.ResourceData, meta interface{}) error {
-
-	o, tmpl := parsePasswordComplexity(d)
-
-	if tmpl != EmptyString {
-		pano := meta.(*pango.Panorama)
-		lo, err := pano.MGTConfig.PasswordComplexity.Get(tmpl)
-		if err != nil {
-			return err
-		}
-		lo.Copy(o)
-		if err = pano.MGTConfig.PasswordComplexity.Edit(tmpl, o); err != nil {
-			return err
-		}
-	} else {
-		fw := meta.(*pango.Firewall)
-		lo, err := fw.MGTConfig.PasswordComplexity.Get()
-		if err != nil {
-			return err
-		}
-		lo.Copy(o)
-		if err = fw.MGTConfig.PasswordComplexity.Edit(o); err != nil {
-			return err
-		}
-	}
-
-	return readPasswordComplexity(d, meta)
 }
 
 // deletePasswordComplexity this func will delete the Password Complexity
