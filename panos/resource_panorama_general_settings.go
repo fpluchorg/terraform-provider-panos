@@ -38,7 +38,7 @@ func resourcePanoramaGeneralSettings() *schema.Resource {
 				Computed:    true,
 				Description: "netmask",
 			},
-			"default-gateway": {
+			"default_gateway": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
@@ -56,7 +56,7 @@ func resourcePanoramaGeneralSettings() *schema.Resource {
 				Default:     true,
 				Description: "Verify update server identity",
 			},
-			"login-banner": {
+			"login_banner": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Login Banner",
@@ -185,10 +185,10 @@ func parsePanoramaGeneralSettings(d *schema.ResourceData) general.Config {
 		Timezone:              d.Get("timezone").(string),
 		IpAddress:             d.Get("ip_address").(string),
 		Netmask:               d.Get("netmask").(string),
-		Gateway:               d.Get("default-gateway").(string),
+		Gateway:               d.Get("default_gateway").(string),
 		UpdateServer:          d.Get("update_server").(string),
 		VerifyUpdateServer:    d.Get("verify_update_server").(bool),
-		LoginBanner:           d.Get("login-banner").(string),
+		LoginBanner:           d.Get("login_banner").(string),
 		ProxyServer:           d.Get("proxy_server").(string),
 		ProxyPort:             d.Get("proxy_port").(int),
 		ProxyUser:             d.Get("proxy_user").(string),
