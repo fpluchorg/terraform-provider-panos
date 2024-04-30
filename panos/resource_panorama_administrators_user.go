@@ -26,25 +26,49 @@ func resourcePanoramaAdministratorsUser() *schema.Resource {
 func panoramaAdministratorsUserSchema() map[string]*schema.Schema {
 	ans := map[string]*schema.Schema{
 		Name: &schema.Schema{
-			Type:     schema.TypeString,
-			Required: true,
+			Type:        schema.TypeString,
+			Required:    true,
+			ForceNew:    true,
+			Description: "The name of the user to create the panorama administrators for.",
 		},
 		PublicKey: &schema.Schema{
-			Type:     schema.TypeString,
-			Optional: true,
+			Type:        schema.TypeString,
+			Optional:    true,
+			Computed:    true,
+			Description: "The public key of the user",
 		},
 		RoleBased: &schema.Schema{
-			Type:     schema.TypeString,
-			Optional: true,
+			Type:        schema.TypeString,
+			Optional:    true,
+			Computed:    true,
+			Description: "Role of the user",
+			ValidateFunc: validateStringIn(
+				"superuser",
+				"superreader",
+				"panorama-admin",
+				"installeradmin",
+				"gpio-esi-ro",
+				"api-rules-automation",
+				"api-object-automation",
+				"api-vmauthkey-automation",
+			),
 		},
 
 		Password: &schema.Schema{
-			Type:     schema.TypeString,
-			Optional: true,
+			Type:        schema.TypeString,
+			Optional:    true,
+			Computed:    true,
+			Description: "The password of the user",
 		},
 		Type: &schema.Schema{
-			Type:     schema.TypeString,
-			Optional: true,
+			Type:        schema.TypeString,
+			Optional:    true,
+			Computed:    true,
+			Description: "Type Role of the user",
+			ValidateFunc: validateStringIn(
+				"dynamic",
+				"custom",
+			),
 		},
 	}
 
@@ -77,7 +101,7 @@ func parsePanoramaAdministratorsUser(d *schema.ResourceData) user.Entry {
 	return o
 }
 
-// createAdministratorsUser this func will create the panorama administrators user
+// createPanoramaAdministratorsUser this func will create the panorama administrators user
 func createPanoramaAdministratorsUser(d *schema.ResourceData, meta interface{}) error {
 	o := parsePanoramaAdministratorsUser(d)
 
@@ -90,7 +114,7 @@ func createPanoramaAdministratorsUser(d *schema.ResourceData, meta interface{}) 
 	return readPanoramaAdministratorsUser(d, meta)
 }
 
-// createAdministratorsUser this func will read the panorama administrators users
+// readPanoramaAdministratorsUser this func will read the panorama administrators users
 func readPanoramaAdministratorsUser(d *schema.ResourceData, meta interface{}) error {
 
 	o := parsePanoramaAdministratorsUser(d)
@@ -107,7 +131,7 @@ func readPanoramaAdministratorsUser(d *schema.ResourceData, meta interface{}) er
 	return nil
 }
 
-// updateAdministratorsUser this func will update the panorama administrators user
+// updatePanoramaAdministratorsUser this func will update the panorama administrators user
 func updatePanoramaAdministratorsUser(d *schema.ResourceData, meta interface{}) error {
 
 	o := parsePanoramaAdministratorsUser(d)
@@ -124,7 +148,7 @@ func updatePanoramaAdministratorsUser(d *schema.ResourceData, meta interface{}) 
 	return readPanoramaAdministratorsUser(d, meta)
 }
 
-// deleteAdministratorsUser this func will delete the panorama administrators user
+// deletePanoramaAdministratorsUser this func will delete the panorama administrators user
 func deletePanoramaAdministratorsUser(d *schema.ResourceData, meta interface{}) error {
 	o := parsePanoramaAdministratorsUser(d)
 

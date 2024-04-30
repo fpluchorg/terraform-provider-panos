@@ -37,28 +37,53 @@ func resourceAdministratorsUser() *schema.Resource {
 func administratorsUserSchema() map[string]*schema.Schema {
 	ans := map[string]*schema.Schema{
 		Name: &schema.Schema{
-			Type:     schema.TypeString,
-			Required: true,
+			Type:        schema.TypeString,
+			Required:    true,
+			ForceNew:    true,
+			Description: "Name of the user",
 		},
 		Template: &schema.Schema{
-			Type:     schema.TypeString,
-			Optional: true,
+			Type:        schema.TypeString,
+			Optional:    true,
+			ForceNew:    true,
+			Description: "Template to assign the user too",
 		},
 		PublicKey: &schema.Schema{
-			Type:     schema.TypeString,
-			Optional: true,
+			Type:        schema.TypeString,
+			Optional:    true,
+			Computed:    true,
+			Description: "Public key of the user",
 		},
 		RoleBased: &schema.Schema{
-			Type:     schema.TypeString,
-			Optional: true,
+			Type:        schema.TypeString,
+			Optional:    true,
+			Computed:    true,
+			Description: "Role based user",
+			ValidateFunc: validateStringIn(
+				"superuser",
+				"superreader",
+				"deviceadmin",
+				"devicereader",
+				"securityadmin",
+				"cryptoadmin",
+				"auditadmin",
+			),
 		},
 		Password: &schema.Schema{
-			Type:     schema.TypeString,
-			Optional: true,
+			Type:        schema.TypeString,
+			Optional:    true,
+			Computed:    true,
+			Description: "Password of the user",
 		},
 		Type: &schema.Schema{
-			Type:     schema.TypeString,
-			Optional: true,
+			Type:        schema.TypeString,
+			Optional:    true,
+			Computed:    true,
+			Description: "Type Role of the user",
+			ValidateFunc: validateStringIn(
+				"dynamic",
+				"custom",
+			),
 		},
 	}
 
