@@ -50,70 +50,87 @@ func PasswordComplexitySchema() map[string]*schema.Schema {
 		Template: &schema.Schema{
 			Type:     schema.TypeString,
 			Optional: true,
+			ForceNew: true,
 		},
 		minimumLength: &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
+			Computed: true,
 		},
 		enabled: &schema.Schema{
-			Type:     schema.TypeString,
+			Type:     schema.TypeBool,
 			Optional: true,
+			Computed: true,
 		},
 		minimumUppercaseLetters: &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
+			Computed: true,
 		},
 		minimumLowercaseLetters: &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
+			Computed: true,
 		},
 		minimumNumericLetters: &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
+			Computed: true,
 		},
 		minimumSpecialCharacters: &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
+			Computed: true,
 		},
 		blockRepeatedCharacters: &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
+			Computed: true,
 		},
 		blockUsernameInclusion: &schema.Schema{
-			Type:     schema.TypeString,
+			Type:     schema.TypeBool,
 			Optional: true,
+			Computed: true,
 		},
 		newPasswordDiffersByCharacters: &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
+			Computed: true,
 		},
 		passwordChangeOnFirstLogin: &schema.Schema{
-			Type:     schema.TypeString,
+			Type:     schema.TypeBool,
 			Optional: true,
+			Computed: true,
 		},
 		passwordHistoryCount: &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
+			Computed: true,
 		},
 		passwordChangePeriodBlock: &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
+			Computed: true,
 		},
 		expirationPeriod: &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
+			Computed: true,
 		},
 		expirationWarningPeriod: &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
+			Computed: true,
 		},
 		postExpirationAdminLoginCount: &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
+			Computed: true,
 		},
 		postExpirationGracePeriod: &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
+			Computed: true,
 		},
 	}
 
@@ -131,7 +148,7 @@ func parsePasswordComplexity(d *schema.ResourceData) (passwordcomplexity.Entry, 
 	}
 
 	if enabled := d.Get(enabled); enabled != nil {
-		o.Enabled = enabled.(string)
+		o.Enabled = enabled.(bool)
 	}
 
 	if minimumUppercaseLetters := d.Get(minimumUppercaseLetters); minimumUppercaseLetters != nil {
@@ -155,7 +172,7 @@ func parsePasswordComplexity(d *schema.ResourceData) (passwordcomplexity.Entry, 
 	}
 
 	if blockUsernameInclusion := d.Get(blockUsernameInclusion); blockUsernameInclusion != nil {
-		o.BlockUsernameInclusion = blockUsernameInclusion.(string)
+		o.BlockUsernameInclusion = blockUsernameInclusion.(bool)
 	}
 
 	if newPasswordDiffersByCharacters := d.Get(newPasswordDiffersByCharacters); newPasswordDiffersByCharacters != nil {
@@ -163,7 +180,7 @@ func parsePasswordComplexity(d *schema.ResourceData) (passwordcomplexity.Entry, 
 	}
 
 	if passwordChangeOnFirstLogin := d.Get(passwordChangeOnFirstLogin); passwordChangeOnFirstLogin != nil {
-		o.PasswordChangeOnFirstLogin = passwordChangeOnFirstLogin.(string)
+		o.PasswordChangeOnFirstLogin = passwordChangeOnFirstLogin.(bool)
 	}
 
 	if passwordHistoryCount := d.Get(passwordHistoryCount); passwordHistoryCount != nil {
