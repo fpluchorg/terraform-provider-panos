@@ -13,10 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
-const IdSeparator string = ":"
-const WrongPanosWithoutAltError string = "This is a %s resource, but encountered a %s system"
-const WrongPanosWithAltError string = "This is a %s resource, but encountered a %s system - Please use %s instead"
-
 func getMovementMap() map[int]string {
 	return map[int]string{
 		util.MoveSkip:           "",
@@ -66,6 +62,7 @@ func movementIsRelative(v int) bool {
 	}
 }
 
+// Deprecated: this function is not used in the application
 func groupIndexes(rules, names []string, move int, oRule string) (int, int, error) {
 	var err error
 	fIdx, oIdx := -1, -1
