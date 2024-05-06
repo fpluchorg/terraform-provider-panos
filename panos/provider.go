@@ -227,12 +227,14 @@ func Provider() terraform.ResourceProvider {
 			"panos_wildfire_analysis_security_profile":    resourceWildfireAnalysisSecurityProfile(),
 
 			// Panorama resources.
+			"panos_administrators_user":                           resourceAdministratorsUser(),
 			"panos_device_group":                                  resourceDeviceGroup(),
 			"panos_device_group_entry":                            resourceDeviceGroupEntry(),
 			"panos_device_group_parent":                           resourceDeviceGroupParent(),
 			"panos_panorama_address_group":                        resourcePanoramaAddressGroup(),
 			"panos_panorama_address_object":                       resourcePanoramaAddressObject(),
 			"panos_panorama_administrative_tag":                   resourcePanoramaAdministrativeTag(),
+			"panos_panorama_administrators_user":                  resourcePanoramaAdministratorsUser(),
 			"panos_panorama_aggregate_interface":                  resourcePanoramaAggregateInterface(),
 			"panos_panorama_application_group":                    resourcePanoramaApplicationGroup(),
 			"panos_panorama_application_object":                   resourcePanoramaApplicationObject(),
