@@ -6,19 +6,14 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
-func resourceGeneralSettings() *schema.Resource {
+func resourcePanoramaGeneralSettings() *schema.Resource {
 	return &schema.Resource{
-		Create: createUpdateGeneralSettings,
-		Read:   readGeneralSettings,
-		Update: createUpdateGeneralSettings,
-		Delete: deleteGeneralSettings,
+		Create: createUpdatePanoramaGeneralSettings,
+		Read:   readPanoramaGeneralSettings,
+		Update: createUpdatePanoramaGeneralSettings,
+		Delete: deletePanoramaGeneralSettings,
 
 		Schema: map[string]*schema.Schema{
-			"template": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Template in case of panorama device",
-			},
 			"hostname": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -31,11 +26,23 @@ func resourceGeneralSettings() *schema.Resource {
 				Computed:    true,
 				Description: "Timezone",
 			},
-			"domain": {
+			"ip_address": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "Domain",
+				Description: "IP Address",
+			},
+			"netmask": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "netmask",
+			},
+			"default_gateway": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Default Gateway",
 			},
 			"update_server": {
 				Type:        schema.TypeString,
@@ -48,6 +55,11 @@ func resourceGeneralSettings() *schema.Resource {
 				Optional:    true,
 				Default:     true,
 				Description: "Verify update server identity",
+			},
+			"login_banner": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Login Banner",
 			},
 			"proxy_server": {
 				Type:     schema.TypeString,
@@ -167,14 +179,16 @@ func resourceGeneralSettings() *schema.Resource {
 	}
 }
 
-func parseGeneralSettings(d *schema.ResourceData) general.Config {
+func parsePanoramaGeneralSettings(d *schema.ResourceData) general.Config {
 	return general.Config{
-		Template:              d.Get("template").(string),
 		Hostname:              d.Get("hostname").(string),
 		Timezone:              d.Get("timezone").(string),
-		Domain:                d.Get("domain").(string),
+		IpAddress:             d.Get("ip_address").(string),
+		Netmask:               d.Get("netmask").(string),
+		Gateway:               d.Get("default_gateway").(string),
 		UpdateServer:          d.Get("update_server").(string),
 		VerifyUpdateServer:    d.Get("verify_update_server").(bool),
+		LoginBanner:           d.Get("login_banner").(string),
 		ProxyServer:           d.Get("proxy_server").(string),
 		ProxyPort:             d.Get("proxy_port").(int),
 		ProxyUser:             d.Get("proxy_user").(string),
@@ -196,151 +210,79 @@ func parseGeneralSettings(d *schema.ResourceData) general.Config {
 	}
 }
 
-func createUpdateGeneralSettings(d *schema.ResourceData, meta interface{}) error {
-	template := d.Get("template").(string)
-	if template == EmptyString {
-		fw, err := firewall(meta, EmptyString)
-		if err != nil {
-			return err
-		}
+func createUpdatePanoramaGeneralSettings(d *schema.ResourceData, meta interface{}) error {
 
-		o, err := fw.Device.GeneralSettings.Get()
-		if err != nil {
-			return err
-		}
-
-		o.Merge(parseGeneralSettings(d))
-		if err = fw.Device.GeneralSettings.Edit(o); err != nil {
-			return err
-		}
-
-		lo, err := fw.Device.GeneralSettings.Get()
-		if err != nil {
-			return err
-		}
-		d.SetId(o.Hostname)
-		err = d.Set("proxy_password_enc", lo.ProxyPassword)
-		if err != nil {
-			return err
-		}
-	} else {
-		pano, err := panorama(meta, EmptyString)
-		if err != nil {
-			return err
-		}
-
-		o, err := pano.Device.GeneralSettings.Get(template, EmptyString, EmptyString)
-		if err != nil {
-			return err
-		}
-
-		o.Merge(parseGeneralSettings(d))
-		if err = pano.Device.GeneralSettings.Edit(template, EmptyString, EmptyString, o); err != nil {
-			return err
-		}
-
-		lo, err := pano.Device.GeneralSettings.Get(template, EmptyString, EmptyString)
-		if err != nil {
-			return err
-		}
-		d.SetId(o.Hostname)
-		err = d.Set("proxy_password_enc", lo.ProxyPassword)
-		if err != nil {
-			return err
-		}
+	pano, err := panorama(meta, EmptyString)
+	if err != nil {
+		return err
 	}
 
-	return readGeneralSettings(d, meta)
+	o, err := pano.Device.GeneralSettings.Get(EmptyString, EmptyString, EmptyString)
+	if err != nil {
+		return err
+	}
+
+	o.Merge(parsePanoramaGeneralSettings(d))
+	if err = pano.Device.GeneralSettings.Edit(EmptyString, EmptyString, EmptyString, o); err != nil {
+		return err
+	}
+
+	lo, err := pano.Device.GeneralSettings.Get(EmptyString, EmptyString, EmptyString)
+	if err != nil {
+		return err
+	}
+	d.SetId(o.Hostname)
+	err = d.Set("proxy_password_enc", lo.ProxyPassword)
+	if err != nil {
+		return err
+	}
+	return readPanoramaGeneralSettings(d, meta)
 }
 
-func readGeneralSettings(d *schema.ResourceData, meta interface{}) error {
-	template := d.Get("template").(string)
-	if template == EmptyString {
-		fw, err := firewall(meta, EmptyString)
-		if err != nil {
-			return err
-		}
-		o, err := fw.Device.GeneralSettings.Get()
-		if err != nil {
-			// I don't think you can delete the general settings from a firewall,
-			// so any error is a real error.
-			return err
-		}
-
-		err = d.Set("hostname", o.Hostname)
-		err = d.Set("timezone", o.Timezone)
-		err = d.Set("domain", o.Domain)
-		err = d.Set("update_server", o.UpdateServer)
-		err = d.Set("verify_update_server", o.VerifyUpdateServer)
-		err = d.Set("proxy_server", o.ProxyServer)
-		err = d.Set("proxy_port", o.ProxyPort)
-		err = d.Set("proxy_user", o.ProxyUser)
-		if d.Get("proxy_password_enc").(string) != o.ProxyPassword {
-			err = d.Set("proxy_password", "(incorrect proxy password)")
-		}
-		err = d.Set("panorama_primary", o.PanoramaPrimary)
-		err = d.Set("panorama_secondary", o.PanoramaSecondary)
-		err = d.Set("dns_primary", o.DnsPrimary)
-		err = d.Set("dns_secondary", o.DnsSecondary)
-		err = d.Set("ntp_primary_address", o.NtpPrimaryAddress)
-		err = d.Set("ntp_primary_auth_type", o.NtpPrimaryAuthType)
-		err = d.Set("ntp_primary_key_id", o.NtpPrimaryKeyId)
-		err = d.Set("ntp_primary_algorithm", o.NtpPrimaryAlgorithm)
-		err = d.Set("ntp_primary_auth_key", o.NtpPrimaryAuthKey)
-		err = d.Set("ntp_secondary_address", o.NtpSecondaryAddress)
-		err = d.Set("ntp_secondary_auth_type", o.NtpSecondaryAuthType)
-		err = d.Set("ntp_secondary_key_id", o.NtpSecondaryKeyId)
-		err = d.Set("ntp_secondary_algorithm", o.NtpSecondaryAlgorithm)
-		err = d.Set("ntp_secondary_auth_key", o.NtpSecondaryAuthKey)
-		if err != nil {
-			return err
-		}
-	} else {
-		pano, err := panorama(meta, EmptyString)
-		if err != nil {
-			return err
-		}
-		o, err := pano.Device.GeneralSettings.Get(template, EmptyString, EmptyString)
-		if err != nil {
-			// I don't think you can delete the general settings from a firewall,
-			// so any error is a real error.
-			return err
-		}
-
-		err = d.Set("hostname", o.Hostname)
-		err = d.Set("timezone", o.Timezone)
-		err = d.Set("domain", o.Domain)
-		err = d.Set("update_server", o.UpdateServer)
-		err = d.Set("verify_update_server", o.VerifyUpdateServer)
-		err = d.Set("proxy_server", o.ProxyServer)
-		err = d.Set("proxy_port", o.ProxyPort)
-		err = d.Set("proxy_user", o.ProxyUser)
-		if d.Get("proxy_password_enc").(string) != o.ProxyPassword {
-			err = d.Set("proxy_password", "(incorrect proxy password)")
-		}
-		err = d.Set("panorama_primary", o.PanoramaPrimary)
-		err = d.Set("panorama_secondary", o.PanoramaSecondary)
-		err = d.Set("dns_primary", o.DnsPrimary)
-		err = d.Set("dns_secondary", o.DnsSecondary)
-		err = d.Set("ntp_primary_address", o.NtpPrimaryAddress)
-		err = d.Set("ntp_primary_auth_type", o.NtpPrimaryAuthType)
-		err = d.Set("ntp_primary_key_id", o.NtpPrimaryKeyId)
-		err = d.Set("ntp_primary_algorithm", o.NtpPrimaryAlgorithm)
-		err = d.Set("ntp_primary_auth_key", o.NtpPrimaryAuthKey)
-		err = d.Set("ntp_secondary_address", o.NtpSecondaryAddress)
-		err = d.Set("ntp_secondary_auth_type", o.NtpSecondaryAuthType)
-		err = d.Set("ntp_secondary_key_id", o.NtpSecondaryKeyId)
-		err = d.Set("ntp_secondary_algorithm", o.NtpSecondaryAlgorithm)
-		err = d.Set("ntp_secondary_auth_key", o.NtpSecondaryAuthKey)
-		if err != nil {
-			return err
-		}
+func readPanoramaGeneralSettings(d *schema.ResourceData, meta interface{}) error {
+	pano, err := panorama(meta, EmptyString)
+	if err != nil {
+		return err
+	}
+	o, err := pano.Device.GeneralSettings.Get(EmptyString, EmptyString, EmptyString)
+	if err != nil {
+		// I don't think you can delete the general settings from a firewall,
+		// so any error is a real error.
+		return err
 	}
 
+	err = d.Set("hostname", o.Hostname)
+	err = d.Set("timezone", o.Timezone)
+	err = d.Set("domain", o.Domain)
+	err = d.Set("update_server", o.UpdateServer)
+	err = d.Set("verify_update_server", o.VerifyUpdateServer)
+	err = d.Set("proxy_server", o.ProxyServer)
+	err = d.Set("proxy_port", o.ProxyPort)
+	err = d.Set("proxy_user", o.ProxyUser)
+	if d.Get("proxy_password_enc").(string) != o.ProxyPassword {
+		err = d.Set("proxy_password", "(incorrect proxy password)")
+	}
+	err = d.Set("panorama_primary", o.PanoramaPrimary)
+	err = d.Set("panorama_secondary", o.PanoramaSecondary)
+	err = d.Set("dns_primary", o.DnsPrimary)
+	err = d.Set("dns_secondary", o.DnsSecondary)
+	err = d.Set("ntp_primary_address", o.NtpPrimaryAddress)
+	err = d.Set("ntp_primary_auth_type", o.NtpPrimaryAuthType)
+	err = d.Set("ntp_primary_key_id", o.NtpPrimaryKeyId)
+	err = d.Set("ntp_primary_algorithm", o.NtpPrimaryAlgorithm)
+	err = d.Set("ntp_primary_auth_key", o.NtpPrimaryAuthKey)
+	err = d.Set("ntp_secondary_address", o.NtpSecondaryAddress)
+	err = d.Set("ntp_secondary_auth_type", o.NtpSecondaryAuthType)
+	err = d.Set("ntp_secondary_key_id", o.NtpSecondaryKeyId)
+	err = d.Set("ntp_secondary_algorithm", o.NtpSecondaryAlgorithm)
+	err = d.Set("ntp_secondary_auth_key", o.NtpSecondaryAuthKey)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func deleteGeneralSettings(d *schema.ResourceData, meta interface{}) error {
+func deletePanoramaGeneralSettings(d *schema.ResourceData, meta interface{}) error {
 	d.SetId(EmptyString)
 	return nil
 }
