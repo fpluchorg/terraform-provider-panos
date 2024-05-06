@@ -69,6 +69,7 @@ func movementIsRelative(v int) bool {
 	}
 }
 
+// Deprecated: this function is not used in the application
 func groupIndexes(rules, names []string, move int, oRule string) (int, int, error) {
 	var err error
 	fIdx, oIdx := -1, -1
