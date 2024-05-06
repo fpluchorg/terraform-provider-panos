@@ -9,7 +9,6 @@ import (
 
 // Local constants init
 const (
-	Template                       = "template"
 	minimumLength                  = "minimum_length"
 	enabled                        = "enabled"
 	minimumUppercaseLetters        = "minimum_uppercase_letters"
