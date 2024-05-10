@@ -216,7 +216,9 @@ func createUpdateGeneralSettings(d *schema.ResourceData, meta interface{}) error
 
 		lo, err := fw.Device.GeneralSettings.Get()
 		if err != nil {
-			return err
+			o = parseGeneralSettings(d)
+		} else {
+			o.Merge(parseGeneralSettings(d))
 		}
 		d.SetId(o.Hostname)
 		err = d.Set("proxy_password_enc", lo.ProxyPassword)
@@ -231,10 +233,11 @@ func createUpdateGeneralSettings(d *schema.ResourceData, meta interface{}) error
 
 		o, err := pano.Device.GeneralSettings.Get(template, EmptyString, EmptyString)
 		if err != nil {
-			return err
+			o = parseGeneralSettings(d)
+		} else {
+			o.Merge(parseGeneralSettings(d))
 		}
 
-		o.Merge(parseGeneralSettings(d))
 		if err = pano.Device.GeneralSettings.Edit(template, EmptyString, EmptyString, o); err != nil {
 			return err
 		}
