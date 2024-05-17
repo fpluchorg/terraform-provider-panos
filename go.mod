@@ -1,7 +1,7 @@
 module github.com/terraform-providers/terraform-provider-panos
 
 require (
-	github.com/fpluchorg/pango v0.11.0
+	github.com/fpluchorg/pango v0.11.1
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/terraform-plugin-sdk v1.17.2
 	golang.org/x/crypto v0.22.0
