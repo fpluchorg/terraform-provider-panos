@@ -1,11 +1,11 @@
 #!/bin/bash
 
 set -x 
-version="1.11.6"
+version="1.12.1"
 
 for os in darwin linux; 
 do
-    for arch in amd64;
+    for arch in amd64 arm64;
     do
         builddir=terraform-provider-panos_${version}_${os}_${arch}
         mkdir -p $builddir

@@ -2,9 +2,10 @@ package panos
 
 import (
 	"github.com/fpluchorg/pango/dev/general"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
+
+const Panorama = "panorama"
 
 func resourceGeneralSettings() *schema.Resource {
 	return &schema.Resource{
@@ -14,7 +15,7 @@ func resourceGeneralSettings() *schema.Resource {
 		Delete: deleteGeneralSettings,
 
 		Schema: map[string]*schema.Schema{
-			"template": {
+			Template: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Template in case of panorama device",
@@ -220,7 +221,11 @@ func createUpdateGeneralSettings(d *schema.ResourceData, meta interface{}) error
 		} else {
 			o.Merge(parseGeneralSettings(d))
 		}
-		d.SetId(o.Hostname)
+		id := o.Hostname
+		if id == EmptyString {
+			id = Panorama
+		}
+		d.SetId(id)
 		err = d.Set("proxy_password_enc", lo.ProxyPassword)
 		if err != nil {
 			return err
@@ -246,7 +251,11 @@ func createUpdateGeneralSettings(d *schema.ResourceData, meta interface{}) error
 		if err != nil {
 			return err
 		}
-		d.SetId(o.Hostname)
+		id := o.Hostname
+		if id == EmptyString {
+			id = template
+		}
+		d.SetId(id)
 		err = d.Set("proxy_password_enc", lo.ProxyPassword)
 		if err != nil {
 			return err
