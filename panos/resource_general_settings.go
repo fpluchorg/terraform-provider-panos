@@ -221,11 +221,8 @@ func createUpdateGeneralSettings(d *schema.ResourceData, meta interface{}) error
 		} else {
 			o.Merge(parseGeneralSettings(d))
 		}
-		id := o.Hostname
-		if id == EmptyString {
-			id = Panorama
-		}
-		d.SetId(id)
+
+		d.SetId(Panorama)
 		err = d.Set("proxy_password_enc", lo.ProxyPassword)
 		if err != nil {
 			return err
@@ -251,11 +248,8 @@ func createUpdateGeneralSettings(d *schema.ResourceData, meta interface{}) error
 		if err != nil {
 			return err
 		}
-		id := o.Hostname
-		if id == EmptyString {
-			id = template
-		}
-		d.SetId(id)
+
+		d.SetId(template)
 		err = d.Set("proxy_password_enc", lo.ProxyPassword)
 		if err != nil {
 			return err
