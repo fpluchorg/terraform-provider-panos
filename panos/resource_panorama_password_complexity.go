@@ -197,7 +197,7 @@ func createPanoramaPasswordComplexity(d *schema.ResourceData, meta interface{}) 
 	}
 	d.SetId(uuid.New().String())
 
-	return readPanoramaPasswordComplexity(d, meta)
+	return nil
 }
 
 // readPanoramaPasswordComplexity this func will read the Panorama Password Complexity
@@ -232,7 +232,7 @@ func updatePanoramaPasswordComplexity(d *schema.ResourceData, meta interface{}) 
 		return err
 	}
 
-	return readPanoramaPasswordComplexity(d, meta)
+	return nil
 }
 
 // deletePanoramaPasswordComplexity this func will delete the Panorama Password Complexity

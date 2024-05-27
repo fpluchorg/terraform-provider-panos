@@ -227,7 +227,7 @@ func createUpdatePasswordComplexity(d *schema.ResourceData, meta interface{}) er
 		d.SetId(uuid.New().String())
 	}
 
-	return readPasswordComplexity(d, meta)
+	return nil
 }
 
 // readPasswordComplexity this func will read the Password Complexity
