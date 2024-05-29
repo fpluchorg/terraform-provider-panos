@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -x 
-version="1.12.1"
+version="1.12.3"
 
 for os in darwin linux; 
 do

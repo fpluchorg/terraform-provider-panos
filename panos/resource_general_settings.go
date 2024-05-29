@@ -5,7 +5,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
-const Panorama = "panorama"
+const (
+	Panorama = "panorama"
+	Device   = "device"
+)
 
 func resourceGeneralSettings() *schema.Resource {
 	return &schema.Resource{
