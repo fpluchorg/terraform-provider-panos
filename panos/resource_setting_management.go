@@ -98,7 +98,7 @@ func createUpdateSettingManagement(d *schema.ResourceData, meta interface{}) err
 			o.Merge(parseFwSettingManagement(d))
 		}
 
-		d.SetId(Panorama)
+		d.SetId(Device)
 
 	} else {
 		pano, err := panorama(meta, EmptyString)
