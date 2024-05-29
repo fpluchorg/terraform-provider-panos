@@ -43,33 +43,102 @@ func resourceSettingManagement() *schema.Resource {
 				Computed:    true,
 				Description: "Stop Traffic when LogDb Ful",
 			},
+			"idle_timeout": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Computed:    true,
+				Description: "Idle Timeout (min)",
+			},
+			"hostname_type_in_syslog": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Send HOSTNAME in Syslog",
+			},
+			"failed_attempts": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Computed:    true,
+				Description: "Failed Attempts",
+			},
+			"lockout_time": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Computed:    true,
+				Description: "Lockout Time (min)",
+			},
+			"max_session_count": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Computed:    true,
+				Description: "Max Session Count (number)",
+			},
+			"max_session_time": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Computed:    true,
+				Description: "Max Session Time (min)",
+			},
+			"threat_vault_access": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Computed:    true,
+				Description: "Threat Vault Access",
+			},
 		},
 	}
 }
 
 func parsePanosSettingManagement(d *schema.ResourceData) settingmanagement.Config {
-	response := settingmanagement.Config{
-		Template: d.Get("template").(string),
+	config := settingmanagement.Config{
+		Template:             d.Get("template").(string),
+		HostnameTypeInSyslog: d.Get("hostname_type_in_syslog").(string),
 	}
+	failedAttempts := d.Get("failed_attempts").(int)
+	config.FailedAttempts = &failedAttempts
+	lockoutTime := d.Get("lockout_time").(int)
+	config.LockoutTime = &lockoutTime
+	maxSessionCount := d.Get("max_session_count").(int)
+	config.MaxSessionCount = &maxSessionCount
+	maxSessionTime := d.Get("max_session_time").(int)
+	config.MaxSessionTime = &maxSessionTime
+	idleTimeout := d.Get("idle_timeout").(int)
+	config.IdleTimeout = &idleTimeout
 	enableLogHighDpLoad := d.Get("enable_log_high_dp_load").(bool)
-	response.EnableLogHighDpLoad = &enableLogHighDpLoad
+	config.EnableLogHighDpLoad = &enableLogHighDpLoad
 	enableHighSpeedLogForwarding := d.Get("enable_high_speed_log_forwarding").(bool)
-	response.EnableHighSpeedLogForwarding = &enableHighSpeedLogForwarding
+	config.EnableHighSpeedLogForwarding = &enableHighSpeedLogForwarding
 	supportUtf8ForLogOutput := d.Get("support_utf8_for_log_output").(bool)
-	response.SupportUtf8ForLogOutput = &supportUtf8ForLogOutput
+	config.SupportUtf8ForLogOutput = &supportUtf8ForLogOutput
 	trafficStopOnLogdbFull := d.Get("traffic_stop_on_logdb_full").(bool)
-	response.TrafficStopOnLogdbFull = &trafficStopOnLogdbFull
-	return response
+	config.TrafficStopOnLogdbFull = &trafficStopOnLogdbFull
+	threatVaultAccess := d.Get("threat_vault_access").(bool)
+	config.ThreatVaultAccess = &threatVaultAccess
+	return config
 }
 
 func parseFwSettingManagement(d *schema.ResourceData) settingmanagement.Config {
-	config := settingmanagement.Config{}
+	config := settingmanagement.Config{
+		HostnameTypeInSyslog: d.Get("hostname_type_in_syslog").(string),
+	}
+	failedAttempts := d.Get("failed_attempts").(int)
+	config.FailedAttempts = &failedAttempts
+	lockoutTime := d.Get("lockout_time").(int)
+	config.LockoutTime = &lockoutTime
+	maxSessionCount := d.Get("max_session_count").(int)
+	config.MaxSessionCount = &maxSessionCount
+	maxSessionTime := d.Get("max_session_time").(int)
+	config.MaxSessionTime = &maxSessionTime
+	idleTimeout := d.Get("idle_timeout").(int)
+	config.IdleTimeout = &idleTimeout
 	enableLogHighDpLoad := d.Get("enable_log_high_dp_load").(bool)
 	config.EnableLogHighDpLoad = &enableLogHighDpLoad
 	supportUtf8ForLogOutput := d.Get("support_utf8_for_log_output").(bool)
 	config.SupportUtf8ForLogOutput = &supportUtf8ForLogOutput
 	trafficStopOnLogdbFull := d.Get("traffic_stop_on_logdb_full").(bool)
 	config.TrafficStopOnLogdbFull = &trafficStopOnLogdbFull
+	threatVaultAccess := d.Get("threat_vault_access").(bool)
+	config.ThreatVaultAccess = &threatVaultAccess
 	return config
 }
 
@@ -139,10 +208,17 @@ func readSettingManagement(d *schema.ResourceData, meta interface{}) error {
 			return err
 		}
 
-		err = d.Set("enable_log_high_dp_load", o.EnableLogHighDpLoad)
 		err = d.Set("enable_high_speed_log_forwarding", o.EnableHighSpeedLogForwarding)
+		err = d.Set("enable_log_high_dp_load", o.EnableLogHighDpLoad)
 		err = d.Set("support_utf8_for_log_output", o.SupportUtf8ForLogOutput)
 		err = d.Set("traffic_stop_on_logdb_full", o.TrafficStopOnLogdbFull)
+		err = d.Set("hostname_type_in_syslog", o.HostnameTypeInSyslog)
+		err = d.Set("failed_attempts", o.FailedAttempts)
+		err = d.Set("lockout_time", o.LockoutTime)
+		err = d.Set("max_session_count", o.MaxSessionCount)
+		err = d.Set("max_session_time", o.MaxSessionTime)
+		err = d.Set("idle_timeout", o.IdleTimeout)
+		err = d.Set("threat_vault_access", o.ThreatVaultAccess)
 		if err != nil {
 			return err
 		}
@@ -159,6 +235,13 @@ func readSettingManagement(d *schema.ResourceData, meta interface{}) error {
 		err = d.Set("enable_log_high_dp_load", o.EnableLogHighDpLoad)
 		err = d.Set("support_utf8_for_log_output", o.SupportUtf8ForLogOutput)
 		err = d.Set("traffic_stop_on_logdb_full", o.TrafficStopOnLogdbFull)
+		err = d.Set("hostname_type_in_syslog", o.HostnameTypeInSyslog)
+		err = d.Set("failed_attempts", o.FailedAttempts)
+		err = d.Set("lockout_time", o.LockoutTime)
+		err = d.Set("max_session_count", o.MaxSessionCount)
+		err = d.Set("max_session_time", o.MaxSessionTime)
+		err = d.Set("idle_timeout", o.IdleTimeout)
+		err = d.Set("threat_vault_access", o.ThreatVaultAccess)
 		if err != nil {
 			return err
 		}

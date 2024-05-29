@@ -49,6 +49,18 @@ func resourcePanoramaSettingManagement() *schema.Resource {
 				Computed:    true,
 				Description: "Idle Timeout (min)",
 			},
+			"support_utf8_for_log_output": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Computed:    true,
+				Description: "Support UTF-8 For Log Output",
+			},
+			"threat_vault_access": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Computed:    true,
+				Description: "Threat Vault Access",
+			},
 		},
 	}
 }
@@ -67,6 +79,10 @@ func parsePanoramaSettingManagement(d *schema.ResourceData) settingmanagement.Co
 	config.MaxSessionTime = &maxSessionTime
 	idleTimeout := d.Get("idle_timeout").(int)
 	config.IdleTimeout = &idleTimeout
+	supportUtf8ForLogOutput := d.Get("support_utf8_for_log_output").(bool)
+	config.SupportUtf8ForLogOutput = &supportUtf8ForLogOutput
+	threatVaultAccess := d.Get("threat_vault_access").(bool)
+	config.ThreatVaultAccess = &threatVaultAccess
 	config.Internal = true
 	return config
 }
@@ -111,6 +127,8 @@ func readPanoramaSettingManagement(d *schema.ResourceData, meta interface{}) err
 	err = d.Set("max_session_count", o.MaxSessionCount)
 	err = d.Set("max_session_time", o.MaxSessionTime)
 	err = d.Set("idle_timeout", o.IdleTimeout)
+	err = d.Set("support_utf8_for_log_output", o.SupportUtf8ForLogOutput)
+	err = d.Set("threat_vault_access", o.ThreatVaultAccess)
 	if err != nil {
 		return err
 	}
