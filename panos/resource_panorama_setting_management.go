@@ -54,20 +54,21 @@ func resourcePanoramaSettingManagement() *schema.Resource {
 }
 
 func parsePanoramaSettingManagement(d *schema.ResourceData) settingmanagement.Config {
-	response := settingmanagement.Config{
+	config := settingmanagement.Config{
 		HostnameTypeInSyslog: d.Get("hostname_type_in_syslog").(string),
 	}
 	failedAttempts := d.Get("failed_attempts").(int)
-	response.FailedAttempts = &failedAttempts
+	config.FailedAttempts = &failedAttempts
 	lockoutTime := d.Get("lockout_time").(int)
-	response.LockoutTime = &lockoutTime
+	config.LockoutTime = &lockoutTime
 	maxSessionCount := d.Get("max_session_count").(int)
-	response.MaxSessionCount = &maxSessionCount
+	config.MaxSessionCount = &maxSessionCount
 	maxSessionTime := d.Get("max_session_time").(int)
-	response.MaxSessionTime = &maxSessionTime
+	config.MaxSessionTime = &maxSessionTime
 	idleTimeout := d.Get("idle_timeout").(int)
-	response.IdleTimeout = &idleTimeout
-	return response
+	config.IdleTimeout = &idleTimeout
+	config.Internal = true
+	return config
 }
 
 func createUpdatePanoramaSettingManagement(d *schema.ResourceData, meta interface{}) error {

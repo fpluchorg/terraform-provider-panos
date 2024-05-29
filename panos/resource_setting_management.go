@@ -63,14 +63,14 @@ func parsePanosSettingManagement(d *schema.ResourceData) settingmanagement.Confi
 }
 
 func parseFwSettingManagement(d *schema.ResourceData) settingmanagement.Config {
-	response := settingmanagement.Config{}
+	config := settingmanagement.Config{}
 	enableLogHighDpLoad := d.Get("enable_log_high_dp_load").(bool)
-	response.EnableLogHighDpLoad = &enableLogHighDpLoad
+	config.EnableLogHighDpLoad = &enableLogHighDpLoad
 	supportUtf8ForLogOutput := d.Get("support_utf8_for_log_output").(bool)
-	response.SupportUtf8ForLogOutput = &supportUtf8ForLogOutput
+	config.SupportUtf8ForLogOutput = &supportUtf8ForLogOutput
 	trafficStopOnLogdbFull := d.Get("traffic_stop_on_logdb_full").(bool)
-	response.TrafficStopOnLogdbFull = &trafficStopOnLogdbFull
-	return response
+	config.TrafficStopOnLogdbFull = &trafficStopOnLogdbFull
+	return config
 }
 
 func createUpdateSettingManagement(d *schema.ResourceData, meta interface{}) error {
