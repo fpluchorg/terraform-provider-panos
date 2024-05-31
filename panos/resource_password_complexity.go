@@ -3,7 +3,6 @@ package panos
 import (
 	"github.com/fpluchorg/pango"
 	"github.com/fpluchorg/pango/mgtconfig/passwordcomplexity"
-	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -224,10 +223,10 @@ func createUpdatePasswordComplexity(d *schema.ResourceData, meta interface{}) er
 		if err := fw.MGTConfig.PasswordComplexity.Set(o); err != nil {
 			return err
 		}
-		d.SetId(uuid.New().String())
+		d.SetId(Device)
 	}
 
-	return nil
+	return readPasswordComplexity(d, meta)
 }
 
 // readPasswordComplexity this func will read the Password Complexity
