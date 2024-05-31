@@ -231,11 +231,8 @@ func createUpdatePanoramaGeneralSettings(d *schema.ResourceData, meta interface{
 	if err != nil {
 		return err
 	}
-	if o.Hostname != "" {
-		d.SetId(o.Hostname)
-	} else {
-		d.SetId(Panorama)
-	}
+
+	d.SetId(Panorama)
 
 	err = d.Set("proxy_password_enc", lo.ProxyPassword)
 	if err != nil {

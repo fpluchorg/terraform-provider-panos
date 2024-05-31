@@ -231,7 +231,7 @@ func createUpdateGeneralSettings(d *schema.ResourceData, meta interface{}) error
 			o.Merge(parseGeneralSettings(d))
 		}
 
-		d.SetId(Panorama)
+		d.SetId(Device)
 		err = d.Set("proxy_password_enc", lo.ProxyPassword)
 		if err != nil {
 			return err

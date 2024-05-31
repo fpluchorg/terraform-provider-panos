@@ -3,7 +3,6 @@ package panos
 import (
 	"github.com/fpluchorg/pango"
 	"github.com/fpluchorg/pango/mgtconfig/passwordcomplexity"
-	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -195,9 +194,10 @@ func createPanoramaPasswordComplexity(d *schema.ResourceData, meta interface{}) 
 	if err := pano.MGTConfig.PasswordComplexity.Set(EmptyString, o); err != nil {
 		return err
 	}
-	d.SetId(uuid.New().String())
+	d.SetId(Panorama)
 
-	return nil
+	return readPanoramaPasswordComplexity(d, meta)
+
 }
 
 // readPanoramaPasswordComplexity this func will read the Panorama Password Complexity
@@ -232,7 +232,7 @@ func updatePanoramaPasswordComplexity(d *schema.ResourceData, meta interface{}) 
 		return err
 	}
 
-	return nil
+	return readPanoramaPasswordComplexity(d, meta)
 }
 
 // deletePanoramaPasswordComplexity this func will delete the Panorama Password Complexity
