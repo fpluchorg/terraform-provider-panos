@@ -25,11 +25,6 @@ func resourcePanoramaPasswordComplexity() *schema.Resource {
 // PanoramaPasswordComplexitySchema initialize the entry params
 func PanoramaPasswordComplexitySchema() map[string]*schema.Schema {
 	ans := map[string]*schema.Schema{
-		Template: &schema.Schema{
-			Type:     schema.TypeString,
-			Optional: true,
-			ForceNew: true,
-		},
 		minimumLength: &schema.Schema{
 			Type:     schema.TypeInt,
 			Optional: true,
@@ -203,17 +198,34 @@ func createPanoramaPasswordComplexity(d *schema.ResourceData, meta interface{}) 
 // readPanoramaPasswordComplexity this func will read the Panorama Password Complexity
 func readPanoramaPasswordComplexity(d *schema.ResourceData, meta interface{}) error {
 
-	parsePanoramaPasswordComplexity(d)
-
-	pano := meta.(*pango.Panorama)
-	if _, err := pano.MGTConfig.PasswordComplexity.Get(EmptyString); err != nil {
-		if isObjectNotFound(err) {
-			d.SetId(EmptyString)
-			return nil
-		}
+	pano, err := panorama(meta, EmptyString)
+	if err != nil {
+		return err
+	}
+	o, err := pano.MGTConfig.PasswordComplexity.Get(EmptyString)
+	if err != nil {
 		return err
 	}
 
+	err = d.Set(minimumLength, o.MinimumLength)
+	err = d.Set(enabled, o.Enabled)
+	err = d.Set(minimumUppercaseLetters, o.MinimumUppercaseLetters)
+	err = d.Set(minimumLowercaseLetters, o.MinimumLowercaseLetters)
+	err = d.Set(minimumNumericLetters, o.MinimumNumericLetters)
+	err = d.Set(minimumSpecialCharacters, o.MinimumSpecialCharacters)
+	err = d.Set(blockRepeatedCharacters, o.BlockRepeatedCharacters)
+	err = d.Set(blockUsernameInclusion, o.BlockUsernameInclusion)
+	err = d.Set(newPasswordDiffersByCharacters, o.NewPasswordDiffersByCharacters)
+	err = d.Set(passwordChangeOnFirstLogin, o.PasswordChangeOnFirstLogin)
+	err = d.Set(passwordHistoryCount, o.PasswordHistoryCount)
+	err = d.Set(passwordChangePeriodBlock, o.PasswordChangePeriodBlock)
+	err = d.Set(expirationPeriod, o.ExpirationPeriod)
+	err = d.Set(expirationWarningPeriod, o.ExpirationWarningPeriod)
+	err = d.Set(postExpirationAdminLoginCount, o.PostExpirationAdminLoginCount)
+	err = d.Set(postExpirationGracePeriod, o.PostExpirationGracePeriod)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
